@@ -1,0 +1,39 @@
+# Directories #
+###############
+Archive
+
+# OS generated files #
+######################
+*/.DS_Store
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Packages #
+############
+*.zip
+
+# SASS #
+########
+tpl_talage/styles/scss/.sass-cache
+tpl_talage/styles/scss/.sass-cache/*
+
+# SublimeText #
+###############
+*.sublime-project
+*.sublime-workspace
+
+# CodeKit #
+###########
+*/*.codekit
+*.codekit
+.codekit-cache
+
+# MySQL Workbench #
+###################
+*.mwb
+*.mwb.bak
