@@ -33,6 +33,7 @@ function enrm_database_setup(){
 		name varchar(250) NOT NULL,
 		org int(11) NOT NULL,
 		description varchar(500) NOT NULL,
+		telephone varchar(14) NOT NULL,
 		website varchar(100) NOT NULL,
 		created datetime NOT NULL,
 		created_by int(11) NOT NULL,

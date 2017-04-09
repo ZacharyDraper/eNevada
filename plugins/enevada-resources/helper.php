@@ -584,6 +584,7 @@ class en_Resource{
   private $name;
   private $org;
   private $status;
+  private $telephone;
   private $website;
   
   // constructor
@@ -599,6 +600,7 @@ class en_Resource{
     $this->name = '';
     $this->org = 0;
     $this->status = 'publish';
+    $this->telephone = '';
     $this->website = '';
   }
 
@@ -698,7 +700,7 @@ class en_Resource{
     $isNew = ($this->id <= 0 ? true : false);
     $reinstating = false;
 
-    // check if this is a duplicate of an existing category
+    // check if this is a duplicate of an existing resource
     if($duplicate = $wpdb->get_row("SELECT id, status FROM {$wpdb->prefix}en_resources WHERE name = '{$this->name}'" . ($isNew ? '' : " AND id != {$this->id}") . " LIMIT 1;")){
       // a duplicate exists
       if($duplicate->status == 'publish'){
@@ -706,7 +708,7 @@ class en_Resource{
         $this->error = 'A resource by this name already exists';
         return false;
       }else{
-        // this organization already exists, but was trashed. Untrash it and update
+        // this resource already exists, but was trashed. Untrash it and update
         $this->status = 'publish';
         $data = array(
           'description' => $this->description,
@@ -714,6 +716,7 @@ class en_Resource{
           'modified_by' => get_current_user_id(),
           'org' => $this->org,
           'status' => $this->status,
+          'telephone' => $this->telephone,
           'website' => $this->website
         );
         $format = array(
@@ -722,6 +725,7 @@ class en_Resource{
           '%d',
           '%s',
           '%d',
+          '%s',
           '%s'
         );
         $where = array(
@@ -747,6 +751,7 @@ class en_Resource{
           'created_by' => get_current_user_id(),
           'org' => $this->org,
           'status' => $this->status,
+          'telephone' => $this->telephoe,
           'website' => $this->website
         );
         $format = array(
@@ -755,6 +760,7 @@ class en_Resource{
           '%s',
           '%d',
           '%d',
+          '%s',
           '%s',
           '%s'
         );
@@ -778,6 +784,7 @@ class en_Resource{
           'name' => $this->name,
           'org' => $this->org,
           'status' => $this->status,
+          'telephone' => $this->telephone,
           'website' => $this->website
         );
         $format = array(
@@ -786,6 +793,7 @@ class en_Resource{
           '%d',
           '%s',
           '%d',
+          '%s',
           '%s',
           '%s'
         );
@@ -832,6 +840,7 @@ class en_Resource{
     $this->name = filter_var(trim($this->name), FILTER_SANITIZE_STRING);    
     $this->org = filter_var($this->org, FILTER_SANITIZE_NUMBER_INT);
     $this->status = filter_var(trim($this->status), FILTER_SANITIZE_STRING);
+    $this->telephone = filter_var(trim($this->telephone), FILTER_SANITIZE_STRING);
     $this->website = filter_var(trim($this->website), FILTER_SANITIZE_STRING);
     $tmp_categories = array();
     foreach($this->categories as $category){
@@ -882,9 +891,16 @@ class en_Resource{
       if(!in_array($this->status, array('publish','draft','trash'))){
         $errors[] = 'You must select a status';
       }
-    }    
+    }
 
-    // website
+    // telephone (optional)
+    if(!empty($this->telephone)){
+      if(!preg_match('/^\(\d{3}\) \d{3}-\d{4}$/', $this->telephone)){
+        $errors[] = 'The phone number you entered is not properly formatted. Please use (xxx) xxx-xxxx';
+      }
+    }
+
+    // website (optional)
     if(!empty($this->website)){
       // TO DO: Add website validation
       if(strlen($this->website) > 100){

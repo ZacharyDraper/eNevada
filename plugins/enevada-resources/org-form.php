@@ -29,7 +29,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 	// validate
 	if($organization->save()){
 		if(filter_has_var(INPUT_POST, 'saveAndClose')){
-			echo '<script type="text/javascript">window.location.href = "' . (is_ssl() ? 'https://' : 'http://') . $_SERVER[HTTP_HOST] . '/wp-admin/admin.php?page=enrm-orgs";</script>';
+			echo '<script type="text/javascript">window.location.href = "/wp-admin/admin.php?page=enrm-orgs";</script>';
 		}
 		$message = 'Organization saved!';
 	}else{

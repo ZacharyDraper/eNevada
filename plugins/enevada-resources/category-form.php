@@ -26,7 +26,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 	// validate
 	if($category->save()){
 		if(filter_has_var(INPUT_POST, 'saveAndClose')){
-			echo '<script type="text/javascript">window.location.href = "' . (is_ssl() ? 'https://' : 'http://') . $_SERVER[HTTP_HOST] . '/wp-admin/admin.php?page=enrm-categories";</script>';
+			echo '<script type="text/javascript">window.location.href = "/wp-admin/admin.php?page=enrm-categories";</script>';
 		}
 		$message = 'Category saved!';
 	}else{
