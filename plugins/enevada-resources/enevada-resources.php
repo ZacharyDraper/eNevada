@@ -4,9 +4,9 @@ Plugin Name: eNevada Resource Map
 URI: http://enevada.org
 Description: This is a custom WordPress plugin for handling the asset map on the eNevada website.
 Version: 1.0.0
-Author: Zachary Draper - Zadra Design
-Author URI: http://zadradesign.com
-License: Copyright 2017 Entrepreneurship Nevada. All rights reserved.
+Author: Zachary Draper
+Author URI: http://zacharydraper.com
+License: Copyright 2017 Zachary Draper and Entrepreneurship Nevada. All rights reserved.
 */
 
 // no direct access
