@@ -23,6 +23,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 	$resource->description = filter_has_var(INPUT_POST, 'description') ? $_POST['description'] : '';
 	$resource->name = filter_has_var(INPUT_POST, 'name') ? $_POST['name'] : '';
 	$resource->org = filter_has_var(INPUT_POST, 'org') ? $_POST['org'] : 0;
+    $resource->slug = filter_has_var(INPUT_POST, 'slug') ? $_POST['slug'] : '';
 	$resource->status = filter_has_var(INPUT_POST, 'status') ? $_POST['status'] : '';
 	$resource->telephone = filter_has_var(INPUT_POST, 'telephone') ? $_POST['telephone'] : '';
 	$resource->website = filter_has_var(INPUT_POST, 'website') ? $_POST['website'] : '';
@@ -249,6 +250,7 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 </div>
 <form name="post" action="" method="post" id="post">
 	<input type="hidden" name="id" value="<?php echo $resource->id; ?>">
+    <input type="hidden" name="slug" value="<?php echo $resource->slug; ?>">
 	<table class="form-table">
 		<tbody>
 			<tr>

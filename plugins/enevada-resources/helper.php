@@ -583,6 +583,7 @@ class en_Resource{
   private $modified_by;
   private $name;
   private $org;
+  private $slug;
   private $status;
   private $telephone;
   private $website;
@@ -599,6 +600,7 @@ class en_Resource{
     $this->modified_by = 0;
     $this->name = '';
     $this->org = 0;
+    $this->slug = '';
     $this->status = 'publish';
     $this->telephone = '';
     $this->website = '';
@@ -620,6 +622,27 @@ class en_Resource{
   }
 
   // methods
+
+  /**
+   * Generates a unique slug based on the name of this resource
+   *
+   * @return string
+   */
+  private function generateUniqueSlug(){
+    global $wpdb;
+
+    $count = 0;
+    while(true){
+      $slug = sanitize_title($this->name) . ($count ? '-' . $count : '');
+
+      $rtnObj = $wpdb->get_row("SELECT id FROM {$wpdb->prefix}en_resources WHERE slug = {$slug} LIMIT 1;");
+      if(!$rtnObj){
+        break;
+      }
+    }
+
+    return $slug;
+  }
 
   /**
    * Get the last error
@@ -715,6 +738,7 @@ class en_Resource{
           'modified' => current_time('mysql', 1),
           'modified_by' => get_current_user_id(),
           'org' => $this->org,
+          'slug' => $this->slug,
           'status' => $this->status,
           'telephone' => $this->telephone,
           'website' => $this->website
@@ -723,8 +747,9 @@ class en_Resource{
           '%s',
           '%s',
           '%d',
-          '%s',
           '%d',
+          '%s',
+          '%s',
           '%s',
           '%s'
         );
@@ -750,6 +775,7 @@ class en_Resource{
           'created' => current_time('mysql', 1),
           'created_by' => get_current_user_id(),
           'org' => $this->org,
+          'slug' => $this->slug,
           'status' => $this->status,
           'telephone' => $this->telephoe,
           'website' => $this->website
@@ -760,6 +786,7 @@ class en_Resource{
           '%s',
           '%d',
           '%d',
+          '%s',
           '%s',
           '%s',
           '%s'
@@ -783,6 +810,7 @@ class en_Resource{
           'modified_by' => get_current_user_id(),
           'name' => $this->name,
           'org' => $this->org,
+          'slug' => $this->slug,
           'status' => $this->status,
           'telephone' => $this->telephone,
           'website' => $this->website
@@ -793,6 +821,7 @@ class en_Resource{
           '%d',
           '%s',
           '%d',
+          '%s',
           '%s',
           '%s',
           '%s'
@@ -839,6 +868,7 @@ class en_Resource{
     $this->id = filter_var($this->id, FILTER_SANITIZE_NUMBER_INT);
     $this->name = filter_var(trim($this->name), FILTER_SANITIZE_STRING);    
     $this->org = filter_var($this->org, FILTER_SANITIZE_NUMBER_INT);
+    $this->slug = filter_var(trim($this->slug), FILTER_SANITIZE_STRING);  
     $this->status = filter_var(trim($this->status), FILTER_SANITIZE_STRING);
     $this->telephone = filter_var(trim($this->telephone), FILTER_SANITIZE_STRING);
     $this->website = filter_var(trim($this->website), FILTER_SANITIZE_STRING);
@@ -882,6 +912,11 @@ class en_Resource{
 //      if(!in_array($this->org, array('publish','draft','trash'))){
 //        $errors[] = 'You must select an organization';
 //      }
+    }
+
+    // slug
+    if(empty($this->slug)){
+      $this->slug = $this->generateUniqueSlug();
     }
 
     // status
