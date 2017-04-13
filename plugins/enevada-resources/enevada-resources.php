@@ -134,4 +134,77 @@ function enrm_orgs_screen(){
 function enrm_resources_screen(){
 	include_once plugin_dir_path(dirname(__FILE__)).'enevada-resources/resource.php';
 }
+
+/** ======= Virtual Page Support ====== **/
+
+// only load if this is not the admin panel
+if(!is_admin()){
+	// inlcude the class
+	include_once 'inc/class-virtualthemedpage-bc.php';
+
+	// instantiate the class, specify the template file to use
+	$vp = new Virtual_Themed_Pages_BC();
+
+	// add the re-write rule
+	$vp->add('#/asset-map(\.html)?$#i', 'render_resources_page');
+	$vp->add('#/asset-map/#i', 'render_individual_resource_page');
+}
+
+/**
+ * This page renders the virtual page for a single resource
+ *
+ * @param obj The virtual page class object
+ * @param string The URL that is loading
+ */
+function render_individual_resource_page($v, $url){
+	global $wpdb;
+
+	// specify the template file to use
+	$v->template = 'resource';
+
+	// include the helper
+	require_once('helper.php');
+
+	// create a resource object
+	$resource = new en_Resource();
+
+	// determine the slug, load it into the object
+	$uri = $_SERVER['REQUEST_URI'];
+	$slug = substr($uri, 11);
+	$end = strrpos($slug, '/');
+	$end = ($end ? $end : strrpos($slug, '.'));
+	if($end){
+		$slug = substr($slug, 0, $end);
+	}
+	$resource->slug = $slug;
+
+	// load the resource data from the database
+	$resource->load();
+
+	// check that such a resource exists
+	$v->body = '';
+	$v->title = 'No resource Found';
+	if($resource->name != '' && $resource->status == 'publish'){
+		// load the name
+		$v->title = $resource->name;
+	}
+
+	$_SESSION['en_resource'] = $resource;
+}
+
+/**
+ * This page renders the virtual page for a single resource
+ *
+ * @param obj The virtual page class object
+ * @param string The URL that is loading
+ */
+function render_resources_page($v, $url){
+	// include the helper
+	require_once('helper.php');
+
+	// specify the template file to use
+	$v->body = '';
+	$v->template = 'resources';
+	$v->title = 'Resources';
+}
 ?>

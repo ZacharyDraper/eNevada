@@ -12,7 +12,35 @@ require_once(dirname(__FILE__) . '/../../../wp-load.php');
 function en_get_categories(){
   global $wpdb;
 
-  return $wpdb->get_results("SELECT id, name FROM {$wpdb->prefix}en_categories WHERE status = 'publish' ORDER BY name ASC;");
+  return $wpdb->get_results("SELECT id, name FROM {$wpdb->prefix}en_categories WHERE status = 'publish' ORDER BY name ASC;", OBJECT_K);
+}
+
+/**
+ * Returns the name of a single category by its ID
+ *
+ * @param Int The ID of the category
+ * @return String The name of the category, empty on fail
+ */
+function en_get_category_name($id){
+  $category = new en_Category();
+  $category->id = $id;
+  $category->load();
+
+  return $category->name;
+}
+
+/**
+ * Returns the name of a single organization by its ID
+ *
+ * @param Int The ID of the organization
+ * @return String The name of the organization, empty on fail
+ */
+function en_get_organization_name($id){
+  $org = new en_Organization();
+  $org->id = $id;
+  $org->load();
+
+  return $org->name;
 }
 
 /**
@@ -21,10 +49,46 @@ function en_get_categories(){
  * @param Int The ID of an organization that must be included in the return
  * @return Array of objects, each object contains the id and name of a single organization
  */
-function en_get_organizations($id){
+function en_get_organizations($id = 0){
   global $wpdb;
 
-  return $wpdb->get_results("SELECT id, name FROM {$wpdb->prefix}en_orgs WHERE status = 'publish'" . ($id ? " OR id = $id": '') . " ORDER BY name ASC;");
+  return $wpdb->get_results("SELECT id, name FROM {$wpdb->prefix}en_orgs WHERE status = 'publish'" . ($id ? " OR id = $id": '') . " ORDER BY name ASC;", OBJECT_K);
+}
+
+/**
+  * Returns an array of Resource objects
+  *
+  * @return Array of en_Resource objects
+  */
+function en_get_resources(){
+  global $wpdb;
+
+  $resources = array();
+
+  // get all categories associations
+  $categories = $wpdb->get_results("SELECT resource, category FROM {$wpdb->prefix}en_resource_categories;"); 
+
+  // pull all active resources
+  $results = $wpdb->get_results("SELECT * FROM {$wpdb->prefix}en_resources WHERE status = 'publish' ORDER BY name ASC;", ARRAY_A);
+  foreach($results as $r){
+    $tmpObj = new en_Resource();
+    foreach($r as $field => $value){
+      $tmpObj->$field = $value;
+    }
+
+    // add in categories
+    $cats = array();
+    foreach($categories as $category){
+      if($category->resource == $tmpObj->id){
+        $cats[] = $category->category;
+      }
+    }
+    $tmpObj->categories = $cats;
+
+    // add this resource to the return
+    $resources[] = $tmpObj;
+  }
+  return $resources;
 }
 
 // ******** Classes ******** //
@@ -658,14 +722,14 @@ class en_Resource{
   }
 
   /**
-   * Retrieve the data for this category from the database
+   * Retrieve the data for this resource from the database
    */
   public function load(){
     global $wpdb;
 
-    // only run if this category has an id
-    if($this->id > 0){
-      $rtnObj = $wpdb->get_row("SELECT * FROM {$wpdb->prefix}en_resources WHERE id = {$this->id} LIMIT 1;");
+    // only run if this resource has an id or a slug
+    if($this->id > 0 || $this->slug){
+      $rtnObj = $wpdb->get_row("SELECT * FROM {$wpdb->prefix}en_resources WHERE " . ($this->id > 0 ? "id = {$this->id}" : "slug = '{$this->slug}'") . ' LIMIT 1;');
       if($rtnObj){
         foreach($rtnObj as $field => $value){
           $this->$field = $value;
