@@ -65,7 +65,7 @@ get_header(); ?>
 									</thead>
 									<tbody>
 										<?php foreach($rs as $resource): ?>
-										<tr data-categories="<?php echo implode(',', $resource->categories); ?>" data-slug="<?php echo $resource->slug; ?>">
+										<tr data-categories="<?php echo implode(',', $resource->categories); ?>" data-description="<?php echo $resource->description; ?>" data-slug="<?php echo $resource->slug; ?>">
 											<td><?php echo $resource->name; ?></td>
 											<td><?php echo $resource->org; ?></td>
 										</tr>
@@ -127,6 +127,10 @@ get_header(); ?>
 								rowMatch = true;
 							}
 						});
+						//  check the description
+						if($(row).data('description').toString().toUpperCase().indexOf(search_term.toUpperCase()) != -1){
+							rowMatch = true;
+						}
 						if(rowMatch){
 							filtered_resources.push(row);
 						}
