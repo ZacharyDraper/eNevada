@@ -173,7 +173,7 @@ get_header(); ?>
 		}
 
 		// navigate to the resource profile when it is clicked
-		$('#resourceList tbody tr').click(function(event){
+		$(document).on('click', '#resourceList tbody tr', function(event){
 			window.location.href = '/asset-map/' + $(this).data('slug') + '.html';
 		});
 	});
