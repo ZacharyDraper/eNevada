@@ -11,6 +11,13 @@
 $resource = $_SESSION['en_resource'];
 unset($_SESSION['en_resource']);
 
+// Make sure every website starts with http://
+if(strpos($resource->website, 'http://') === false && strpos($resource->website, 'https://') === false){
+	$web_address = 'http://' . $resource->website;
+}else{
+	$web_address = $resource->website;
+}
+
 get_header(); ?>
 <div id="templateContent">
 	<div class="container">
@@ -24,14 +31,16 @@ get_header(); ?>
 								<header class="entry-header">
 									<div class="row">
 										<div class="col-md-8 col-lg-9">
-											<h1 class="entry-title">
-												<a href="http://enevada.org/asset-map/<?php echo $resource->slug; ?>.html" title="Permalink to <?php echo $resource->name; ?>" rel="bookmark"><?php echo $resource->name; ?></a>
-											</h1>
+											<h1 class="entry-title"><?php echo $resource->name; ?></h1>
 											<p><b><?php echo en_get_organization_name($resource->org); ?></b></p>
 										</div>
 										<div class="col-md-4 col-lg-3">
-											<?php if($resource->website): ?>
-												<p class="hidden-xs hidden-sm" style="text-align: right;"><a class="btn btn-primary" rel="noopener noreferrer" target="_blank" title="Visit Website" href="<?php echo $resource->website; ?>">Visit Website</a></p>
+											<?php if($resource->website):
+											 ?>
+												<p class="hidden-xs hidden-sm" style="text-align: right;"><a class="btn btn-primary" rel="noopener noreferrer" target="_blank" title="Visit Website" href="<?php echo $web_address; ?>">Visit Website</a></p>
+											<?php endif;
+											if($resource->email): ?>
+												<p class="hidden-xs hidden-sm" style="text-align: right;"><a class="btn btn-primary" rel="noopener noreferrer" target="_blank" title="Email <?php echo $resource->name; ?>" href="mailto:<?php echo $resource->email; ?>">Email</a></p>
 											<?php endif; ?>
 										</div>
 									</div>
@@ -39,11 +48,16 @@ get_header(); ?>
 								<div class="entry-content">
 									<p><?php echo $resource->description; ?></p>
 									<?php if($resource->telephone): ?>
-									<p>Reach out to <?php echo $resource->name . ' at ' . $resource->telephone; ?>.</p>
+									<p>Reach out to <?php echo $resource->contact_name . ' of ' . $resource->name . ' at ' . $resource->telephone; ?> to learn more.</p>
 									<?php endif;
-									if($resource->website): ?>
-									<p class="hidden-md hidden-lg"><a class="btn btn-primary" rel="noopener noreferrer" target="_blank" title="Visit Website" href="<?php echo $resource->website; ?>">Visit Website</a></p>
-									<?php endif;
+									if($resource->website):
+										?>
+									<p class="hidden-md hidden-lg"><a class="btn btn-primary" rel="noopener noreferrer" target="_blank" title="Visit Website" href="<?php $web_address; ?>">Visit Website</a></p>
+									<?php
+									endif;
+									if($resource->email): ?>
+									<p class="hidden-md hidden-lg"><a class="btn btn-primary" rel="noopener noreferrer" target="_blank" title="Email <?php echo $resource->name; ?>" href="mailto:<?php echo $resource->email; ?>">Email</a></p>
+									<?php endif; 
 									$categories = array();
 									foreach($resource->categories as $category){
 										$categories[] = en_get_category_name($category);

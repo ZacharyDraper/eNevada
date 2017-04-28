@@ -639,9 +639,11 @@ class en_Resource{
   private $error = '';
 
   private $categories;
+  private $contact_name;
   private $created;
   private $created_by;
   private $description;
+  private $email;
   private $id;
   private $modified;
   private $modified_by;
@@ -656,9 +658,11 @@ class en_Resource{
   function __construct(){
     // set defaults
     $this->categories = array();
+    $this->contact_name = '';
     $this->created = new DateTime('0000-00-00 00:00:00');
     $this->created_by = 0;
     $this->description = '';
+    $this->email = '';
     $this->id = 0;
     $this->modified = new DateTime('0000-00-00 00:00:00');
     $this->modified_by = 0;
@@ -798,7 +802,9 @@ class en_Resource{
         // this resource already exists, but was trashed. Untrash it and update
         $this->status = 'publish';
         $data = array(
+          'contact_name' => $this->contact_name,
           'description' => $this->description,
+          'email' => $this->email,
           'modified' => current_time('mysql', 1),
           'modified_by' => get_current_user_id(),
           'org' => $this->org,
@@ -808,6 +814,8 @@ class en_Resource{
           'website' => $this->website
         );
         $format = array(
+          '%s',
+          '%s',
           '%s',
           '%s',
           '%d',
@@ -834,7 +842,9 @@ class en_Resource{
       if($isNew){
         // add the new record
         $data = array(
+          'contact_name' => $this->contact_name,
           'description' => $this->description,
+          'email' => $this->email,
           'name' => $this->name,
           'created' => current_time('mysql', 1),
           'created_by' => get_current_user_id(),
@@ -845,6 +855,8 @@ class en_Resource{
           'website' => $this->website
         );
         $format = array(
+          '%s',
+          '%s',
           '%s',
           '%s',
           '%s',
@@ -869,7 +881,9 @@ class en_Resource{
       }else{
         // update the record
         $data = array(
+          'contact_name' => $this->contact_name,
           'description' => $this->description,
+          'email' => $this->email,
           'modified' => current_time('mysql', 1),
           'modified_by' => get_current_user_id(),
           'name' => $this->name,
@@ -880,6 +894,8 @@ class en_Resource{
           'website' => $this->website
         );
         $format = array(
+          '%s',
+          '%s',
           '%s',
           '%s',
           '%d',
@@ -928,7 +944,9 @@ class en_Resource{
     $errors = array();
 
     // trim and sanitize each variable
+    $this->contact_name = filter_var(trim($this->contact_name), FILTER_SANITIZE_STRING);
     $this->description = filter_var(trim($this->description), FILTER_SANITIZE_STRING); 
+    $this->email = filter_var(trim($this->email), FILTER_SANITIZE_EMAIL);
     $this->id = filter_var($this->id, FILTER_SANITIZE_NUMBER_INT);
     $this->name = filter_var(trim($this->name), FILTER_SANITIZE_STRING);    
     $this->org = filter_var($this->org, FILTER_SANITIZE_NUMBER_INT);
@@ -947,7 +965,14 @@ class en_Resource{
 
     // categories
     if(empty($this->categories)){
-      $errors[] = 'You must select at least one category for this resource.';
+      $errors[] = 'You must select at least one category for this resource';
+    }
+
+    // contact name (optional)
+    if(!empty($this->contact_name)){
+     if(strlen($this->contact_name) > 75){
+        $errors[] = 'The contact name you entered is too long';
+      }
     }
 
     // description
@@ -956,6 +981,13 @@ class en_Resource{
     }else{
       if(strlen($this->description) > 500){
         $errors[] = 'The description you entered is too long';
+      }
+    }
+
+    // email (optional)
+    if(!empty($this->email)){
+      if(!filter_var($this->email, FILTER_VALIDATE_EMAIL)){
+        $errors[] = 'The email address you entered is invalid';
       }
     }
     

@@ -20,8 +20,10 @@ if(filter_has_var(INPUT_POST, 'id')){
 if($_SERVER['REQUEST_METHOD'] == 'POST'){
 	// retrieve the input
 	$resource->categories = filter_has_var(INPUT_POST, 'categories') ? $_POST['categories'] : array();
+    $resource->contact_name = filter_has_var(INPUT_POST, 'contact_name') ? $_POST['contact_name'] : '';
 	$resource->description = filter_has_var(INPUT_POST, 'description') ? $_POST['description'] : '';
-	$resource->name = filter_has_var(INPUT_POST, 'name') ? $_POST['name'] : '';
+	$resource->email = filter_has_var(INPUT_POST, 'email') ? $_POST['email'] : '';
+    $resource->name = filter_has_var(INPUT_POST, 'name') ? $_POST['name'] : '';
 	$resource->org = filter_has_var(INPUT_POST, 'org') ? $_POST['org'] : 0;
     $resource->slug = filter_has_var(INPUT_POST, 'slug') ? $_POST['slug'] : '';
 	$resource->status = filter_has_var(INPUT_POST, 'status') ? $_POST['status'] : '';
@@ -249,64 +251,91 @@ if($_SERVER['REQUEST_METHOD'] == 'POST'){
 	</p>
 </div>
 <form name="post" action="" method="post" id="post">
-	<input type="hidden" name="id" value="<?php echo $resource->id; ?>">
+    <input type="hidden" name="id" value="<?php echo $resource->id; ?>">
     <input type="hidden" name="slug" value="<?php echo $resource->slug; ?>">
-	<table class="form-table">
-		<tbody>
-			<tr>
-				<th scope="row"><label for="status" class="required">Status</label></th>
-				<td>
-					<select name="status" id="status">
-						<option value="publish"<?php echo $resource->status == 'publish' ? ' selected="selected"' : ''; ?>>Published</option>
-						<option value="draft"<?php echo $resource->status == 'draft' ? ' selected="selected"' : ''; ?>>Draft</option>
-						<option value="trash"<?php echo $resource->status == 'trash' ? ' selected="selected"' : ''; ?>>Trash</option>
-					</select>
-				</td>
-			</tr>
-			<tr>
-				<th scope="row"><label for="name" class="required">Resource Name</label></th>
-				<td><input name="name" id="name" value="<?php echo $resource->name; ?>" class="regular-text" type="text" maxlength="250"></td>
-			</tr>
-			<tr>
-				<th scope="row"><label for="org" class="required">Organization</label></th>
-				<td>
-					<select name="org" id="org">
-						<option value="0">-- Select An Organization --</option>
-						<?php 
-						$organizations = en_get_organizations($resource->org);
-						foreach($organizations as $org): 
-						?>
-							<option value="<?php echo $org->id; ?>"<?php echo ($resource->org == $org->id ? ' selected' : ''); ?>><?php echo $org->name; ?></option>
-						<?php endforeach; ?>
-					</select>
-				</td>
-			</tr>
-			<tr>
-				<th scope="row"><label for="description" class="required">Description</label></th>
-				<td><textarea name="description" id="description" style="height:100px;width:350px;"><?php echo $resource->description; ?></textarea></td>
-			</tr>
-			<tr>
-				<th scope="row"><label for="telephone">Telephone Number</label></th>
-				<td><input name="telephone" id="telephone" value="<?php echo $resource->telephone; ?>" class="regular-text" type="text" maxlength="14"></td>
-			</tr>
-			<tr>
-				<th scope="row"><label for="website">Website Address</label></th>
-				<td><input name="website" id="website" value="<?php echo $resource->website; ?>" class="regular-text" type="text" maxlength="100"></td>
-			</tr>
-			<tr>
-				<th scope="row"><label class="required">Categories</label></th>
-				<td>
-					<?php 
-					$categories = en_get_categories();
-					foreach($categories as $cat):
-					?>
-						<label for="cat<?php echo $cat->id; ?>"><input type="checkbox" name="categories[]"  id="cat<?php echo $cat->id; ?>" value="<?php echo $cat->id; ?>"<?php echo (in_array($cat->id, $resource->categories) ? ' checked' : ''); ?>> <?php echo $cat->name; ?></label><br>
-					<?php endforeach; ?>
-				</td>
-			</tr>
-		</tbody>
-	</table>
-	<p class="submit">
-		<input name="save" id="save" class="button button-primary" value="Save" type="submit">
-		<input name="saveAndClose" id="saveAndClose" class="button button-primary" value="Save &amp; Close" type="submit">
-	</p>
+    <table style="border:0;">
+        <tr>
+            <td style="vertical-align: top; width: 47%">
+            	<table class="form-table">
+            		<tbody>
+            			<tr>
+            				<th scope="row"><label for="status" class="required">Status</label></th>
+            				<td>
+            					<select name="status" id="status">
+            						<option value="publish"<?php echo $resource->status == 'publish' ? ' selected="selected"' : ''; ?>>Published</option>
+            						<option value="draft"<?php echo $resource->status == 'draft' ? ' selected="selected"' : ''; ?>>Draft</option>
+            						<option value="trash"<?php echo $resource->status == 'trash' ? ' selected="selected"' : ''; ?>>Trash</option>
+            					</select>
+            				</td>
+            			</tr>
+            			<tr>
+            				<th scope="row"><label for="name" class="required">Resource Name</label></th>
+            				<td><input name="name" id="name" value="<?php echo $resource->name; ?>" class="regular-text" type="text" maxlength="250"></td>
+            			</tr>
+            			<tr>
+            				<th scope="row"><label for="org" class="required">Organization</label></th>
+            				<td>
+            					<select name="org" id="org" style="width: 100%;">
+            						<option value="0">-- Select An Organization --</option>
+            						<?php 
+            						$organizations = en_get_organizations($resource->org);
+            						foreach($organizations as $org): 
+            						?>
+            							<option value="<?php echo $org->id; ?>"<?php echo ($resource->org == $org->id ? ' selected' : ''); ?>><?php echo $org->name; ?></option>
+            						<?php endforeach; ?>
+            					</select>
+            				</td>
+            			</tr>
+            			<tr>
+            				<th scope="row"><label for="description" class="required">Description</label></th>
+            				<td><textarea name="description" id="description" style="height:100px;width:350px;"><?php echo $resource->description; ?></textarea></td>
+            			</tr>
+            			<tr>
+            				<th scope="row"><label for="website">Website Address</label></th>
+            				<td><input name="website" id="website" value="<?php echo $resource->website; ?>" class="regular-text" type="text" maxlength="100"></td>
+            			</tr>
+            			<tr>
+            				<th scope="row"><label class="required">Categories</label></th>
+            				<td>
+            					<?php 
+            					$categories = en_get_categories();
+            					foreach($categories as $cat):
+            					?>
+            						<label for="cat<?php echo $cat->id; ?>"><input type="checkbox" name="categories[]"  id="cat<?php echo $cat->id; ?>" value="<?php echo $cat->id; ?>"<?php echo (in_array($cat->id, $resource->categories) ? ' checked' : ''); ?>> <?php echo $cat->name; ?></label><br>
+            					<?php endforeach; ?>
+            				</td>
+            			</tr>
+            		</tbody>
+            	</table>
+            </td>
+            <td style="width: 6%;">
+                &nbsp;
+            </td>
+            <td style="vertical-align: top; width: 47%">
+                <table class="form-table">
+                    <tbody>
+                        <tr>
+                            <td colspan="2"><h3 style="border-bottom: 1px solid black; margin: 0 0 0 -20px; papdding: 0;">Contact Information</h3></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="contact_name">Contact Person</label></th>
+                            <td><input name="contact_name" id="contact_name" value="<?php echo $resource->contact_name; ?>" class="regular-text" type="text" maxlength="75"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="email">Email Address</label></th>
+                            <td><input name="email" id="email" value="<?php echo $resource->email; ?>" class="regular-text" type="text" maxlength="100"></td>
+                        </tr>
+                        <tr>
+                            <th scope="row"><label for="telephone">Telephone Number</label></th>
+                            <td><input name="telephone" id="telephone" value="<?php echo $resource->telephone; ?>" class="regular-text" type="text" maxlength="14"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </td>
+        </tr>
+    </table>
+    <p class="submit">
+    	<input name="save" id="save" class="button button-primary" value="Save" type="submit">
+    	<input name="saveAndClose" id="saveAndClose" class="button button-primary" value="Save &amp; Close" type="submit">
+    </p>
+</form>
