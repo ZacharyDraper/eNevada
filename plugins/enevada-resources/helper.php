@@ -703,7 +703,7 @@ class en_Resource{
     while(true){
       $slug = sanitize_title($this->name) . ($count ? '-' . $count : '');
 
-      $rtnObj = $wpdb->get_row("SELECT id FROM {$wpdb->prefix}en_resources WHERE slug = {$slug} LIMIT 1;");
+      $rtnObj = $wpdb->get_row("SELECT id FROM {$wpdb->prefix}en_resources WHERE slug = '{$slug}' LIMIT 1;");
       if(!$rtnObj){
         break;
       }
@@ -851,7 +851,7 @@ class en_Resource{
           'org' => $this->org,
           'slug' => $this->slug,
           'status' => $this->status,
-          'telephone' => $this->telephoe,
+          'telephone' => $this->telephone,
           'website' => $this->website
         );
         $format = array(
