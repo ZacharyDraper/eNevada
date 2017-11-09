@@ -347,6 +347,7 @@ class en_Organization{
   private $description;
   private $email;
   private $id;
+  private $logo;
   private $modified;
   private $modified_by;
   private $name;
@@ -361,6 +362,7 @@ class en_Organization{
     $this->created_by = 0;
     $this->description = '';
     $this->id = 0;
+    $this->logo = '';
     $this->modified = new DateTime('0000-00-00 00:00:00');
     $this->modified_by = 0;
     $this->name = '';
@@ -396,7 +398,7 @@ class en_Organization{
     if($this->error){
       return $this->error;
     }else{
-      return 'An unspecified error occured';
+      return 'An unspecified error occurred';
     }
   }
 
@@ -452,11 +454,13 @@ class en_Organization{
           'email' => $this->email,
           'fname' => $this->fname,
           'lname' => $this->lname,
+          'logo' => $this->logo,
           'modified' => current_time('mysql', 1),
           'modified_by' => get_current_user_id(),
           'status' => $this->status
         );
         $format = array(
+          '%s',
           '%s',
           '%s',
           '%s',
@@ -478,12 +482,14 @@ class en_Organization{
           'email' => $this->email,
           'fname' => $this->fname,
           'lname' => $this->lname,
+          'logo' => $this->logo,
           'name' => $this->name,
           'created' => current_time('mysql', 1),
           'created_by' => get_current_user_id(),
           'status' => $this->status
         );
         $format = array(
+          '%s',
           '%s',
           '%s',
           '%s',
@@ -506,12 +512,14 @@ class en_Organization{
           'email' => $this->email,
           'fname' => $this->fname,
           'lname' => $this->lname,
+          'logo' => $this->logo,
           'modified' => current_time('mysql', 1),
           'modified_by' => get_current_user_id(),
           'name' => $this->name,
           'status' => $this->status
         );
         $format = array(
+          '%s',
           '%s',
           '%s',
           '%s',
@@ -557,6 +565,7 @@ class en_Organization{
     $this->email = filter_var(trim($this->email), FILTER_SANITIZE_EMAIL);
     $this->fname = filter_var(trim($this->fname), FILTER_SANITIZE_STRING);
     $this->lname = filter_var(trim($this->lname), FILTER_SANITIZE_STRING);
+    $this->logo = filter_var($this->logo, FILTER_SANITIZE_URL);
     $this->id = filter_var($this->id, FILTER_SANITIZE_NUMBER_INT);
     $this->name = filter_var(trim($this->name), FILTER_SANITIZE_STRING);
     $this->status = filter_var(trim($this->status), FILTER_SANITIZE_STRING);
@@ -571,32 +580,24 @@ class en_Organization{
     }
     
     // email
-    if(empty($this->email)){
-      $errors[] = 'You must enter the email address of the organization contact';
-    }elseif(!filter_var($this->email, FILTER_VALIDATE_EMAIL)){
-      $errors[] = 'You email address you entered is invalid';
-    }else{
-      if(strlen($this->email) > 100){
-        $errors[] = 'The email address you entered is too long';
+    if(!empty($this->email)){
+      if(!filter_var($this->email, FILTER_VALIDATE_EMAIL)){
+        $errors[] = 'You email address you entered is invalid';
+      }else{
+        if(strlen($this->email) > 100){
+          $errors[] = 'The email address you entered is too long';
+        }
       }
     }
     
     // fname
-    if(empty($this->fname)){
-      $errors[] = 'You must enter the first name of the organization contact';
-    }else{
-      if(strlen($this->fname) > 50){
-        $errors[] = 'The first name you entered is too long';
-      }
+    if(!empty($this->fname) && strlen($this->fname) > 50){
+      $errors[] = 'The first name you entered is too long';
     }
     
     // lname
-    if(empty($this->lname)){
-      $errors[] = 'You must enter the last name of the organization contact';
-    }else{
-      if(strlen($this->lname) > 50){
-        $errors[] = 'The last name you entered is too long';
-      }
+    if(empty($this->lname) && strlen($this->lname) > 50){
+      $errors[] = 'The last name you entered is too long';
     }
     
     // name

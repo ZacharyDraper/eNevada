@@ -117,6 +117,14 @@ function enrm_admin_menu_setup(){
 add_action('admin_menu', 'enrm_admin_menu_setup');
 
 /**
+ * Get the WordPress Media Uploader ready
+ */
+function enrm_enqueue_media_uploader(){
+  wp_enqueue_media();
+}
+add_action('admin_enqueue_scripts', 'enrm_enqueue_media_uploader');
+
+/**
  * Function to draw the categories screen
  */
 function enrm_categories_screen(){
